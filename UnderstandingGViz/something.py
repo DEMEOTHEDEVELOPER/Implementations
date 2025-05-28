@@ -30,13 +30,13 @@ def drawNodes(G, nodes):
 # 
 def drawEdges(G, edges):
     for edge in edges:
-        edge = edge.strip("\n").split(',')
+        edge = edge.strip("\n").strip("\r").split(',')
         G.add_edge(float(edge[0]),float(edge[1]))
         
-def drawTheta4(G, positions):
+def drawYao4(G, positions):
     currnode = 1
     for i in positions:
-        for cone in range(2):
+        for cone in range(4):
             closest = None
             distance = float('inf')
             currcheck = 0
@@ -67,10 +67,34 @@ def drawTheta4(G, positions):
                         closest = currcheck
                         distance = node_distance
                         
+                if cone == 2:
+                    
+                    if not xj< xi or not yj < yi:
+                        continue
+                    
+                    node_distance = math.sqrt( ((xi-xj) ** 2) + ((yi - yj) **2))
+                    if node_distance < distance:
+                        closest = currcheck
+                        distance = node_distance
+                        
+                if cone == 3:
+                    
+                    if not xi< xj or not yj < yi:
+                        continue
+                    
+                    node_distance = math.sqrt( ((xj-xi) ** 2) + ((yi - yj) **2))
+                    if node_distance < distance:
+                        closest = currcheck
+                        distance = node_distance
+                        
             if not distance == float('inf'):
                 G.add_edge(currnode, closest)
         currnode +=1
     
+
+def drawTheta4(G, positions):
+    print("Hello")
+
 
 def main():
     #Make an empty graph
@@ -85,19 +109,19 @@ def main():
     
     #if the user added an edges file
     if len(sys.argv)> 2:
-        match sys.argv[2]:
+        match sys.argv[2].lower():
             case "edges.txt":
                 f = open(sys.argv[2])
                 edges = f.readlines()
                 drawEdges(G, edges)
-            case "theta-4":
-                drawTheta4(G, positions)
+            case "yao-4":
+                drawYao4(G, positions)
                 
         
         
     pos = nx.get_node_attributes(G,'pos')
     #plt.subplot(111)
-    nx.draw(G, pos=pos, with_labels=True)
+    nx.draw(G, pos=pos, with_labels=False, node_size=5)
     plt.show()
     
     
