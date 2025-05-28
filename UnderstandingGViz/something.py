@@ -93,7 +93,62 @@ def drawYao4(G, positions):
     
 
 def drawTheta4(G, positions):
-    print("Hello")
+    currnode = 1
+    for i in positions:
+        for cone in range(4):
+            closest = None
+            distance = float('inf')
+            currcheck = 0
+            
+            for j in positions:
+                currcheck +=1
+                if currcheck == currnode:
+                    continue
+                xi, xj = (i[0], j[0])
+                yi, yj = (i[1], j[1])
+                
+                if cone == 0:
+                    if not xi < xj or not yi < yj:
+                        continue
+                    
+                    node_distance = (xj - xi) + (yj-yi) / 2
+                    if node_distance < distance:
+                        closest = currcheck
+                        distance = node_distance
+                        
+                if cone == 1:
+                    
+                    if not xj< xi or not yi < yj:
+                        continue
+                    
+                    node_distance = (xi - xj) + (yj-yi) / 2
+                    if node_distance < distance:
+                        closest = currcheck
+                        distance = node_distance
+                        
+                if cone == 2:
+                    
+                    if not xj< xi or not yj < yi:
+                        continue
+                    
+                    node_distance = (xi - xj) + (yi-yj) / 2
+                    if node_distance < distance:
+                        closest = currcheck
+                        distance = node_distance
+                        
+                if cone == 3:
+                    
+                    if not xi< xj or not yj < yi:
+                        continue
+                    
+                    node_distance = (xj - xi) + (yi-yj) / 2
+                    if node_distance < distance:
+                        closest = currcheck
+                        distance = node_distance
+                        
+            if not distance == float('inf'):
+                G.add_edge(currnode, closest)
+        currnode +=1
 
 
 def main():
@@ -116,6 +171,8 @@ def main():
                 drawEdges(G, edges)
             case "yao-4":
                 drawYao4(G, positions)
+            case "theta-4":
+                drawTheta4(G, positions)
                 
         
         
