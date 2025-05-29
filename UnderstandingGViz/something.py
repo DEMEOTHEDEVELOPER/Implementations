@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import sys
 import math
 
+def test():
+    print(99)
+
 # Placing the nodes onscreen
 def drawNodes(G, nodes):
     positions = []
@@ -150,37 +153,31 @@ def drawTheta4(G, positions):
                 G.add_edge(currnode, closest)
         currnode +=1
 
+def open_file(filepath, selection):
+    file = open(filepath)
+    nodes = file.readlines()
+    build(nodes, selection)
 
-def main():
+
+def build(nodes, selection):
     #Make an empty graph
     G = nx.Graph()
-    #import the nodes
-    if (sys.argv[1] != "nodes.txt"):
-        exit("nodes.txt not found after program filename\nTry - \"python3 something.py nodes.txt\"")
-    f = open(sys.argv[1])
-    nodes = f.readlines()
+    
     
     positions = drawNodes(G, nodes)
     
     #if the user added an edges file
-    if len(sys.argv)> 2:
-        match sys.argv[2].lower():
-            case "edges.txt":
-                f = open(sys.argv[2])
-                edges = f.readlines()
-                drawEdges(G, edges)
-            case "yao-4":
-                drawYao4(G, positions)
-            case "theta-4":
-                drawTheta4(G, positions)
+    print(selection)
+    match selection.lower():
+        case "yao-4":
+            print("Yao")
+            drawYao4(G, positions)
+        case "theta-4":
+            drawTheta4(G, positions)
                 
         
         
     pos = nx.get_node_attributes(G,'pos')
-    #plt.subplot(111)
     nx.draw(G, pos=pos, with_labels=False, node_size=5)
     plt.show()
     
-    
-if __name__=="__main__":
-    main()
