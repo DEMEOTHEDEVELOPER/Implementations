@@ -100,7 +100,7 @@ def drawYao(G, positions, degree):
     angle = 360 / degree
     currnode = 1
     for i in positions:
-        origin = np.array(i[0],i[1])
+        origin = np.array([i[0],i[1]])
         for cone in range(degree):
             
             closest = None
@@ -185,6 +185,51 @@ def drawTheta(G, positions, degree):
                 
                 
         currnode+=1
+        
+def drawTheta6(G, positions):
+    currnode = 1
+    angle = 360 / 6
+    for i in positions:
+        origin = np.array([i[0],i[1]])
+        for cone in [1,3,5]:
+            closest = None
+            distance = float('inf')
+            currcheck = 0
+            
+            #Building the cone
+            angleA = math.radians(cone * angle)
+            angleB = math.radians((cone+1)*angle)
+            vecA = np.array([math.cos(angleA), math.sin(angleA)])
+            vecB = np.array([math.cos(angleB), math.sin(angleB)])
+            
+            normA = vecA / np.linalg.norm(vecA)
+            normB = vecB / np.linalg.norm(vecB)
+            
+            bisector = normA + normB
+            bisector /= np.linalg.norm(bisector)
+            
+            for j in positions:
+                currcheck+=1
+                
+                point = np.array([j[0],j[1]])
+                
+                if currcheck ==currnode:
+                    continue
+                    
+                if not(np.cross(normA, point - origin) >= 0 and np.cross(point - origin, normB) >= 0 and np.dot(normA, point - origin) >=0 and np.dot(normB, point - origin) >=0):
+                    continue
+                
+                projection = np.dot(point - origin, bisector)
+                
+                if projection < distance:
+                    
+                    distance = projection
+                    closest = currcheck
+            if not distance == float('inf'):
+                G.add_edge(currnode, closest)
+                
+                
+        currnode+=1
                     
                     
 def open_file(filepath, selection, degree):
@@ -207,6 +252,8 @@ def build(nodes, selection, degree):
             drawYao(G, positions, degree)
         case "theta":
             drawTheta(G, positions, degree)
+        case "half theta-6":
+            drawTheta6(G, positions)
                 
         
         

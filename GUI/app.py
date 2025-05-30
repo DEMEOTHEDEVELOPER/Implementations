@@ -27,6 +27,7 @@ def main():
     typeList.insert(1, "None")
     typeList.insert(2, "Theta")
     typeList.insert(3, "Yao")
+    typeList.insert(4,"Half Theta-6")
     typeList.config(height=3)
     listlabel.pack()
     typeList.pack()
