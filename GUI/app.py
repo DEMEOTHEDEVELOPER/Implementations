@@ -1,13 +1,14 @@
 import tkinter as tk
 from tkinter import filedialog
-from UnderstandingGViz import something
+#from UnderstandingGViz import something
+from Algs import control
 
     
 def get_file(selection, degree):
     degree = int(degree)
     path = filedialog.askopenfilename()
     if path:
-        something.open_file(path, selection, degree)
+        control.openFile(path, selection, degree)
         
 
 
