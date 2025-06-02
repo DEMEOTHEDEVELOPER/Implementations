@@ -1,15 +1,36 @@
 import tkinter as tk
 from tkinter import filedialog
-#from UnderstandingGViz import something
 from Algs import control
+import random
 
     
-def get_file(selection, degree):
-    degree = int(degree)
+def get_file(selection, degree=4):
+    if not (selection == "Half Theta-6"):
+        degree = int(degree)
+
     path = filedialog.askopenfilename()
     if path:
         control.openFile(path, selection, degree)
         
+def get_random(selection, degree=4, amount = 10):
+    amount = int(amount)
+    control.build(selection, degree, amount)
+
+def randomtoggle(var, submitBtn, nodeLabel, nodeField,frame1, frame2, typeList, conebox):
+    if var.get():
+        submitBtn.config(command=lambda: get_random(typeList.get(typeList.curselection()[0]), conebox.get(), int(nodeField.get())))
+        nodeLabel.pack()
+        nodeField.pack()
+        frame1.pack_forget()
+        frame2.pack()
+        frame1.pack()
+    else:
+        submitBtn.config(command=lambda:get_file(typeList.get(typeList.curselection()[0]), conebox.get()))
+        nodeLabel.pack_forget()
+        nodeField.pack_forget()
+        frame2.pack_forget()
+    
+    
 
 
 def main():
@@ -30,17 +51,25 @@ def main():
     typeList.insert(3, "Yao")
     typeList.insert(4,"Half Theta-6")
     typeList.config(height=3)
+    typeList.selection_set(1)
     listlabel.pack()
     typeList.pack()
     nodefileLabel.pack()
     
-    coneLabel = tk.Label(root, text="Enter # of cones")
+    coneLabel = tk.Label(root, text="Enter # of cones (Default 4)")
     coneLabel.pack()
     conebox = tk.Entry(root)
     conebox.pack()
     frame = tk.Frame(root, pady=20)
-    submitBtn = tk.Button(frame, text="Build Graph", command=lambda: get_file(typeList.get(typeList.curselection()[0]), conebox.get()), bg="white", fg="black").pack()
+    var = tk.IntVar()
+    submitBtn = tk.Button(frame, text="Build Graph", command=lambda: get_file(typeList.get(typeList.curselection()[0]), conebox.get()), bg="white", fg="black")
+    frame2 = tk.Frame(root)
+    nodeLabel = tk.Label(frame2, text="Enter number of nodes")
+    nodeField = tk.Entry(frame2)
+    randomCheckbtn = tk.Checkbutton(root, text="Random nodes?", variable=var, onvalue=1 , offvalue=0, command=lambda: randomtoggle(var, submitBtn, nodeLabel, nodeField, frame, frame2, typeList,conebox)).pack()
     
+    submitBtn.pack()
+    frame2.pack()
     frame.pack()
     root.mainloop()
 
