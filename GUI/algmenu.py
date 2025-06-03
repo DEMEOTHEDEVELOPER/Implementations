@@ -22,5 +22,6 @@ def show(amount, G, selection, degree):
     qlabel = tk.Label(frame1, text="Choose destination").pack()
     chooseq = tk.Entry(frame1).pack()
     routeButton = tk.Button(frame1, text="See route", command= lambda:show_route(origin, destination, amount, G)).pack()
+
     frame1.pack()
     root.mainloop()

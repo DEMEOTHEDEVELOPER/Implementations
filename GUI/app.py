@@ -3,7 +3,11 @@ from tkinter import filedialog
 from Algs import control
 import random
 
+
+        
+
     
+
 def get_file(selection, degree=4):
     if not (selection == "Half Theta-6"):
         degree = int(degree)
@@ -34,6 +38,18 @@ def randomtoggle(var, submitBtn, nodeLabel, nodeField,frame1, frame2, typeList, 
 
 
 def main():
+
+    def checkVal(event):
+        listbox = event.widget
+        selection = listbox.get(listbox.curselection())
+        if selection == "Yao" or selection == "Theta":
+            frame.pack_forget()
+            coneFrame.pack()
+            frame.pack()
+        else:
+            coneFrame.pack_forget()
+        
+    
     root = tk.Tk()
     root.title("Building Graphs")
     root.geometry("240x300")
@@ -51,14 +67,17 @@ def main():
     typeList.insert(3, "Yao")
     typeList.insert(4,"Half Theta-6")
     typeList.config(height=3)
+    typeList.bind("<<ListboxSelect>>",checkVal)
     typeList.selection_set(0)
     listlabel.pack()
     typeList.pack()
     nodefileLabel.pack()
     
-    coneLabel = tk.Label(root, text="Enter # of cones (Default 4)")
+    coneFrame = tk.Frame(root)
+    
+    coneLabel = tk.Label(coneFrame, text="Enter # of cones (Default 4)")
     coneLabel.pack()
-    conebox = tk.Entry(root)
+    conebox = tk.Entry(coneFrame)
     conebox.pack()
     frame = tk.Frame(root, pady=20)
     var = tk.IntVar()
@@ -69,8 +88,9 @@ def main():
     randomCheckbtn = tk.Checkbutton(root, text="Random nodes?", variable=var, onvalue=1 , offvalue=0, command=lambda: randomtoggle(var, submitBtn, nodeLabel, nodeField, frame, frame2, typeList,conebox)).pack()
     
     submitBtn.pack()
-    frame2.pack()
+    coneFrame.pack()
     frame.pack()
+    frame2.pack()
     root.mainloop()
 
 if __name__ == "__main__":
