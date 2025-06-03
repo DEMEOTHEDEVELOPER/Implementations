@@ -13,12 +13,12 @@ def get_file(selection, degree=4):
         control.openFile(path, selection, degree)
         
 def get_random(selection, degree=4, amount = 10):
-    amount = int(amount)
+    amount = int(amount) if not amount == '' else 10
     control.build(selection, degree, amount)
 
 def randomtoggle(var, submitBtn, nodeLabel, nodeField,frame1, frame2, typeList, conebox):
     if var.get():
-        submitBtn.config(command=lambda: get_random(typeList.get(typeList.curselection()[0]), conebox.get(), int(nodeField.get())))
+        submitBtn.config(command=lambda: get_random(typeList.get(typeList.curselection()[0]), conebox.get(), nodeField.get()))
         nodeLabel.pack()
         nodeField.pack()
         frame1.pack_forget()
@@ -51,7 +51,7 @@ def main():
     typeList.insert(3, "Yao")
     typeList.insert(4,"Half Theta-6")
     typeList.config(height=3)
-    typeList.selection_set(1)
+    typeList.selection_set(0)
     listlabel.pack()
     typeList.pack()
     nodefileLabel.pack()

@@ -1,4 +1,5 @@
 from pyvis.network import Network
+from GUI import algmenu
 import numpy as np
 import math
 import random
@@ -203,6 +204,7 @@ def build(selection, degree, amount = 10, nodes = ""):
     selectGraph(G, selection, degree, positions)
     
     G.show("Routing_Visualizer.html",notebook=False)
+    algmenu.show(len(positions), G, selection, degree)
     
 def openFile(filepath, selection, degree):
     file = open(filepath)
