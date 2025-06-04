@@ -159,7 +159,12 @@ def drawNodes(G, nodes):
         while y in xdata:
             y += 0.000001
         ydata.append(y)
-        G.add_node(curr, label=curr, x = (x* 100), y = -(y * 100), fixed=True)
+        html = f"""
+        Node #:  {curr}
+        X position: {x}
+        Y position: {y}
+        """
+        G.add_node(curr, label=curr, x = (x* 100), y = -(y * 100), fixed=True, title =html)
         curr+=1
         positions.append((x,y))
     return positions
@@ -180,7 +185,13 @@ def randomNodes(G, amount):
         xdata.append(x)
         ydata.append(y)
         
-        G.add_node(curr, label=curr, x = (x*100), y = -(y*100), fixed = True)
+        html = f"""
+        Node #:  {curr}
+        X position: {x}
+        Y position: {y}
+        """
+        
+        G.add_node(curr, label=curr, x = (x*100), y = -(y*100), fixed = True, title=html, size = 50)
         curr +=1
         positions.append((x,y))
         
@@ -196,7 +207,7 @@ def selectGraph(G, selection, degree, positions):
         case "half theta-6":
             drawTheta6(G, positions)
 
-def build(selection, degree, amount = 10, nodes = ""):
+def build(selection, degree, random, amount = 10, nodes = ""):
     G = Network(height='1000px', width='100%', notebook=True)
     
     positions =  randomNodes(G, amount) if random else drawNodes(G, nodes)
@@ -204,9 +215,10 @@ def build(selection, degree, amount = 10, nodes = ""):
     selectGraph(G, selection, degree, positions)
     
     G.show("Routing_Visualizer.html",notebook=False)
-    algmenu.show(len(positions), G, selection, degree)
+    algmenu.show(len(positions), G, selection, degree, positions)
     
 def openFile(filepath, selection, degree):
     file = open(filepath)
     nodes = file.readlines()
-    build(selection, degree, nodes)
+    random = False
+    build(selection, degree, random, nodes=nodes)

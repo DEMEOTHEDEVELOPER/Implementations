@@ -9,7 +9,8 @@ import random
     
 
 def get_file(selection, degree=4):
-    if not (selection == "Half Theta-6"):
+    
+    if not (selection == "Half Theta-6" or selection == "None"):
         degree = int(degree)
 
     path = filedialog.askopenfilename()
@@ -17,8 +18,9 @@ def get_file(selection, degree=4):
         control.openFile(path, selection, degree)
         
 def get_random(selection, degree=4, amount = 10):
+    random = True
     amount = int(amount) if not amount == '' else 10
-    control.build(selection, degree, amount)
+    control.build(selection, degree, random, amount)
 
 def randomtoggle(var, submitBtn, nodeLabel, nodeField,frame1, frame2, typeList, conebox):
     if var.get():
@@ -88,7 +90,7 @@ def main():
     randomCheckbtn = tk.Checkbutton(root, text="Random nodes?", variable=var, onvalue=1 , offvalue=0, command=lambda: randomtoggle(var, submitBtn, nodeLabel, nodeField, frame, frame2, typeList,conebox)).pack()
     
     submitBtn.pack()
-    coneFrame.pack()
+    
     frame.pack()
     frame2.pack()
     root.mainloop()
