@@ -18,6 +18,8 @@ def get_file(selection, degree=4):
         control.openFile(path, selection, degree)
         
 def get_random(selection, degree=4, amount = 10):
+    if not (selection == "Half Theta-6" or selection == "None"):
+        degree = int(degree)
     random = True
     amount = int(amount) if not amount == '' else 10
     control.build(selection, degree, random, amount)
@@ -44,7 +46,7 @@ def main():
     def checkVal(event):
         listbox = event.widget
         selection = listbox.get(listbox.curselection())
-        if selection == "Yao" or selection == "Theta":
+        if selection == "Yao" or selection == "Theta" or selection == "Ordered Theta":
             frame.pack_forget()
             coneFrame.pack()
             frame.pack()
@@ -68,6 +70,7 @@ def main():
     typeList.insert(2, "Theta")
     typeList.insert(3, "Yao")
     typeList.insert(4,"Half Theta-6")
+    typeList.insert(5,"Ordered Theta")
     typeList.config(height=3)
     typeList.bind("<<ListboxSelect>>",checkVal)
     typeList.selection_set(0)
