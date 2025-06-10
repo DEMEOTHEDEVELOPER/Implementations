@@ -375,6 +375,10 @@ def buildOrderedThetaRand(G, degree, amount):
     return positions
             
         
+def drawDelaunay(G, positions):
+    print("Drawing Graph")        
+
+
 def selectGraph(G, selection, degree, positions):
     match selection.lower():
         case "yao":
@@ -383,6 +387,8 @@ def selectGraph(G, selection, degree, positions):
             drawTheta(G, positions, degree)
         case "half theta-6":
             drawTheta6(G, positions)
+        case "delaunay":
+            drawDelaunay(G, positions)
         
 
 def build(selection, degree, random, amount = 10, nodes = ""):
