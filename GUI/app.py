@@ -7,23 +7,26 @@ import random
         
 
     
-
+# This is the function that prompts the user to upload a file
 def get_file(selection, degree=4):
-    
-    if not (selection == "Half Theta-6" or selection == "None"):
+    # Just doing some basic error avoidance
+    if not (selection == "Half Theta-6" or selection == "None" or selection == "Delaunay"):
         degree = int(degree)
-
+    # Get the file
     path = filedialog.askopenfilename()
     if path:
         control.openFile(path, selection, degree)
-        
+    
+# This function sets up the build function, does not ask for a file because it was indicated that the user would like random points
 def get_random(selection, degree=4, amount = 10):
-    if not (selection == "Half Theta-6" or selection == "None"):
+    if not (selection == "Half Theta-6" or selection == "None" or selection == "Delaunay"):
         degree = int(degree)
     random = True
+    # Number of nodes to be graphed
     amount = int(amount) if not amount == '' else 10
     control.build(selection, degree, random, amount)
 
+# This toggles some of the visual elements on screen, specifically the fields that ask for the number of nodes to be randomly produced
 def randomtoggle(var, submitBtn, nodeLabel, nodeField,frame1, frame2, typeList, conebox):
     if var.get():
         submitBtn.config(command=lambda: get_random(typeList.get(typeList.curselection()[0]), conebox.get(), nodeField.get()))
@@ -42,7 +45,7 @@ def randomtoggle(var, submitBtn, nodeLabel, nodeField,frame1, frame2, typeList, 
 
 
 def main():
-
+    # This is just checking the value of the selected element of the listbox. Depending on the selection, a cone field will be visible. This is another sort of toggle
     def checkVal(event):
         listbox = event.widget
         selection = listbox.get(listbox.curselection())
@@ -53,16 +56,15 @@ def main():
         else:
             coneFrame.pack_forget()
         
-    
+    # Building the root of the GUI
     root = tk.Tk()
     root.title("Building Graphs")
     root.geometry("240x300")
     
+    # The following are all GUI elements
+    
     nodefileLabel = tk.Label(root, text="Upload node file and Build Graph")
     
-    
-    #uploadBtn = tk.Button(root, text = "Upload", command = get_file, bg="White", fg="black")
-    #uploadBtn.pack()
     
     listlabel = tk.Label(root, text="Choose the type of graph")
     typeList = tk.Listbox(root)
@@ -71,6 +73,7 @@ def main():
     typeList.insert(3, "Yao")
     typeList.insert(4,"Half Theta-6")
     typeList.insert(5,"Ordered Theta")
+    typeList.insert(6, "Delaunay")
     typeList.config(height=3)
     typeList.bind("<<ListboxSelect>>",checkVal)
     typeList.selection_set(0)
