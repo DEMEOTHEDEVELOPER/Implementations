@@ -10,7 +10,8 @@ import random
 # This is the function that prompts the user to upload a file
 def get_file(selection, degree=4):
     # Just doing some basic error avoidance
-    if not (selection == "Half Theta-6" or selection == "None" or selection == "Delaunay"):
+    fixedDeg = ["Half Theta-6","None", "Delaunay", "Degree 12 spanner"]
+    if not selection in fixedDeg:
         degree = int(degree)
     # Get the file
     path = filedialog.askopenfilename()
@@ -19,7 +20,8 @@ def get_file(selection, degree=4):
     
 # This function sets up the build function, does not ask for a file because it was indicated that the user would like random points
 def get_random(selection, degree=4, amount = 10):
-    if not (selection == "Half Theta-6" or selection == "None" or selection == "Delaunay"):
+    fixedDeg = ["Half Theta-6","None", "Delaunay", "Degree 12 spanner"]
+    if not selection in fixedDeg:
         degree = int(degree)
     random = True
     # Number of nodes to be graphed
@@ -47,9 +49,10 @@ def randomtoggle(var, submitBtn, nodeLabel, nodeField,frame1, frame2, typeList, 
 def main():
     # This is just checking the value of the selected element of the listbox. Depending on the selection, a cone field will be visible. This is another sort of toggle
     def checkVal(event):
+        needDeg = ["Yao","Theta","Ordered Theta"]
         listbox = event.widget
         selection = listbox.get(listbox.curselection())
-        if selection == "Yao" or selection == "Theta" or selection == "Ordered Theta":
+        if selection in needDeg:
             frame.pack_forget()
             coneFrame.pack()
             frame.pack()

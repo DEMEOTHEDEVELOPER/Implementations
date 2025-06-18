@@ -378,6 +378,10 @@ def buildOrderedThetaRand(G, degree, amount):
 def drawDelaunay(G, positions):
     print("Drawing Graph")        
 
+def drawDegree12(G, positions):
+    drawTheta6(G, positions)
+    #for node in positions:
+    print(G.get_adj_list())
 
 def selectGraph(G, selection, degree, positions):
     match selection.lower():
@@ -389,10 +393,12 @@ def selectGraph(G, selection, degree, positions):
             drawTheta6(G, positions)
         case "delaunay":
             drawDelaunay(G, positions)
+        case "degree 12 spanner":
+            drawDegree12(G, positions)
         
 
 def build(selection, degree, random, amount = 10, nodes = ""):
-    G = Network(height='1000px', width='100%', notebook=True)
+    G = Network(height='1000px', width='100%', notebook=True, select_menu=True, filter_menu=True)
     
     built = False
     
