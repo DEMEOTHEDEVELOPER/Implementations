@@ -74,6 +74,7 @@ def main():
     typeList.insert(4,"Half Theta-6")
     typeList.insert(5,"Ordered Theta")
     typeList.insert(6, "Delaunay")
+    typeList.insert(7, "Degree 12 spanner")
     typeList.config(height=3)
     typeList.bind("<<ListboxSelect>>",checkVal)
     typeList.selection_set(0)
