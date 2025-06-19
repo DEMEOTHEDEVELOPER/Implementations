@@ -136,7 +136,7 @@ def drawTheta6(G, positions):
             if not distance == float('inf'):
                 G.add_edge(currnode, closest)
                 
-                
+                 
         currnode+=1
         
 
@@ -379,9 +379,41 @@ def drawDelaunay(G, positions):
     print("Drawing Graph")        
 
 def drawDegree12(G, positions):
+    angle = 360 /6
     drawTheta6(G, positions)
-    #for node in positions:
-    print(G.get_adj_list())
+    adjlist = G.get_adj_list()
+    for i in range(len(positions)):
+        curr = i+ 1
+        origin = G.get_node(curr)
+        edges = adjlist.get(curr)
+        opoint = np.array([origin.get('x') / 100, - origin.get('y') / 100])
+        addEdges = []
+        
+        for cone in [2,4,6]:
+            # Check all the edges, ensure they are in the cone, and keep only the a) closest b) smallest angle to the left cone edge c) smallest angle to the right cone edge
+            closest = None
+            rightmost = None
+            leftmost = None
+            distance = float('inf')
+            leftAngle = float('inf')
+            rightAngle = float('inf')
+            currcheck = 0
+            
+            # Creating the cone and its bisector
+            angleA = math.radians(cone * angle)
+            angleB = math.radians((cone+1)*angle)
+            vecA = np.array([math.cos(angleA), math.sin(angleA)])
+            vecB = np.array([math.cos(angleB), math.sin(angleB)])
+            
+            normA = vecA / np.linalg.norm(vecA)
+            normB = vecB / np.linalg.norm(vecB)
+            
+            bisector = normA + normB
+            bisector /= np.linalg.norm(bisector)
+            
+            for v in edges:
+                print(v)
+   
 
 def selectGraph(G, selection, degree, positions):
     match selection.lower():
