@@ -342,11 +342,11 @@ def buildOrderedThetaRand(G, degree, amount):
             
             for j in positions:
                 currcheck +=1
-                #creating the point
-                point = np.array([j[0], j[1]])
                 # ensuring that we are not checking the origin against itself
                 if currcheck == curr:
                     continue
+                #creating the point
+                point = np.array([j[0], j[1]])
                 
                 # Checking to make sure that the point is within the cone
                 if not(np.cross(normA, point - origin) >= 0 and np.cross(point - origin, normB) >= 0 and np.dot(normA, point - origin) >=0 and np.dot(normB, point - origin) >=0):
@@ -374,7 +374,18 @@ def buildOrderedThetaRand(G, degree, amount):
         curr += 1
     return positions
             
-        
+            
+def getAngle(cone, point):
+    dot = np.dot(point, cone)
+    normProduct = np.linalg.norm(cone) * np.linalg.norm(point)
+    
+    clippedCos = np.clip(dot / normProduct, -1.0, 1.0)
+    
+    #Returnong the angle
+    rads = np.arccos(clippedCos)
+    return np.degrees(rads)
+
+
 def drawDelaunay(G, positions):
     print("Drawing Graph")        
 
@@ -395,8 +406,8 @@ def drawDegree12(G, positions):
             rightmost = None
             leftmost = None
             distance = float('inf')
-            leftAngle = float('inf')
-            rightAngle = float('inf')
+            leftmostAngle = float('inf')
+            rightmostAngle = float('inf')
             currcheck = 0
             
             # Creating the cone and its bisector
@@ -412,7 +423,40 @@ def drawDegree12(G, positions):
             bisector /= np.linalg.norm(bisector)
             
             for v in edges:
-                print(v)
+                p = G.get_node(v)
+                point = np.array([p.get('x')/100, - p.get('y') / 100])
+                pos = point - opoint
+                # Checking to make sure that the point is within the cone
+                if not(np.cross(normA, pos) >= 0 and np.cross(pos, normB) >= 0 and np.dot(normA, pos) >=0 and np.dot(normB, pos) >=0):
+                    continue
+                
+                # Check for closest
+                projection = np.dot(pos, bisector)
+                if projection < distance:
+                    distance = projection
+                    closest = v
+                
+                ang = getAngle(vecA, pos)
+                print(ang)
+                # Check for rightmost'
+                if ang < rightmostAngle:
+                    rightmostAngle = ang
+                    rightmost = curr
+                    
+                ang = getAngle(vecB, pos)
+                # Check for leftmost
+                if ang < rightmostAngle:
+                    rightmostAngle = ang
+                    rightmost = curr
+                
+            addEdges += [(closest, "red"), (rightmost, "green"), (leftmost, "orange")]
+        
+        for edge in G.edges:
+            if edge.get('from') == curr or edge.get('to') == curr:
+                G.edges.remove(edge)
+                
+        for v in addEdges:
+            if v[0] is not None: G.add_edge(curr, v[0], color = v[1])
    
 
 def selectGraph(G, selection, degree, positions):
