@@ -385,6 +385,11 @@ def getAngle(cone, point):
     rads = np.arccos(clippedCos)
     return np.degrees(rads)
 
+def inCone(normA, normB, pos):
+    if np.cross(normA, normB) < 0:
+        normA, normB = normB, normA
+        
+    return np.cross(normA, pos) >=0 and np.cross(pos, normB) >= 0
 
 def drawDelaunay(G, positions):
     print("Drawing Graph")        
@@ -426,8 +431,9 @@ def drawDegree12(G, positions):
                 p = G.get_node(v)
                 point = np.array([p.get('x')/100, - p.get('y') / 100])
                 pos = point - opoint
+                
                 # Checking to make sure that the point is within the cone
-                if not(np.cross(normA, pos) >= 0 and np.cross(pos, normB) >= 0 and np.dot(normA, pos) >=0 and np.dot(normB, pos) >=0):
+                if not inCone(normA, normB, pos):
                     continue
                 
                 # Check for closest
@@ -441,22 +447,25 @@ def drawDegree12(G, positions):
                 # Check for rightmost'
                 if ang < rightmostAngle:
                     rightmostAngle = ang
-                    rightmost = curr
+                    rightmost = v
                     
                 ang = getAngle(vecB, pos)
+                print(ang)
                 # Check for leftmost
-                if ang < rightmostAngle:
-                    rightmostAngle = ang
-                    rightmost = curr
-                
-            addEdges += [(closest, "red"), (rightmost, "green"), (leftmost, "orange")]
+                if ang < leftmostAngle:
+                    leftomostAngle = ang
+                    leftmost = v
+            addEdges += [(closest, "red")]
+            if rightmost is not closest: addEdges += [(rightmost, "yellow")]
+            if leftmost is not rightmost and leftmost is not closest: addEdges += [(leftmost, "green")]
+            
         
         for edge in G.edges:
-            if edge.get('from') == curr or edge.get('to') == curr:
+            if edge.get('to') == curr:
                 G.edges.remove(edge)
                 
         for v in addEdges:
-            if v[0] is not None: G.add_edge(curr, v[0], color = v[1])
+            if v[0] is not None: G.add_edge(v[0], curr, color = v[1])
    
 
 def selectGraph(G, selection, degree, positions):
