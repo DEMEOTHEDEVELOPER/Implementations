@@ -134,7 +134,7 @@ def drawTheta6(G, positions):
                     distance = projection
                     closest = currcheck
             if not distance == float('inf'):
-                G.add_edge(currnode, closest)
+                G.add_edge(currnode, closest, color="blue")
                 
                  
         currnode+=1
@@ -381,7 +381,7 @@ def getAngle(cone, point):
     
     clippedCos = np.clip(dot / normProduct, -1.0, 1.0)
     
-    #Returnong the angle
+    #Returning the angle
     rads = np.arccos(clippedCos)
     return np.degrees(rads)
 
@@ -451,6 +451,7 @@ def drawDegree12(G, positions):
                     
                 ang = getAngle(vecB, pos)
                 print(ang)
+                print(curr)
                 # Check for leftmost
                 if ang < leftmostAngle:
                     leftomostAngle = ang
@@ -467,6 +468,19 @@ def drawDegree12(G, positions):
         for v in addEdges:
             if v[0] is not None: G.add_edge(v[0], curr, color = v[1])
    
+# This is the matching algorithm used to build a plane spanner of degree 3 on a pair of convex chains
+# def matching(C1, C2):
+#     if len(C1.get_nodes()) == 0 or len(C2.get_nodes()) == 0:
+#         return None
+#     edge = None
+#     distance = float('inf')
+#     pair = None
+#     for i in C1.get_nodes():
+#         for j in C2.get_nodes():
+#             d = math.sqrt((((i.get('x') / 100)- (j.get('x') / 100 )) **2) + ((i.get('y') / 100) - )
+#             if d < distance:
+#                 pair = (i,j)
+            
 
 def selectGraph(G, selection, degree, positions):
     match selection.lower():
@@ -483,7 +497,7 @@ def selectGraph(G, selection, degree, positions):
         
 
 def build(selection, degree, random, amount = 10, nodes = ""):
-    G = Network(height='1000px', width='100%', notebook=True, select_menu=True, filter_menu=True)
+    G = Network(height='1000px', width='100%', notebook=True, directed = True,select_menu=True, filter_menu=True)
     
     built = False
     
