@@ -44,8 +44,10 @@ def inCone(u, p, cone):
 
 
 def getEdge(fro, to, edges):
+    print(len(edges))
     for edge in edges:
-        if edge['from'] is fro and edge['to'] is to:
+        print(edge)
+        if edge['from'] == fro and edge['to'] == to:
             return edge
 
     return None
@@ -146,7 +148,9 @@ def routeTheta4(G, origin, destination, positions):
         Routing Ratio:              {(pathlength/1000)/eudist}
         Euclidean distance (p->q):  {eudist}
         """
-        G.edges.remove(getEdge(i[0], i[1], G.edges))
+        edge = getEdge(i[0], i[1], G.edges)
+        print(edge)
+        G.edges.remove(edge)
         G.add_edge(i[0], i[1], color="#FF0000" if i[2] == 'Sweep' else '#0000FF' , title=html, width=40)
 
     return pathlength
