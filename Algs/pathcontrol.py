@@ -24,13 +24,13 @@ def projection(origin, point, vec):
     return origin + projection * vec
 
 
-def inCone(u, p, cone):
+def inCone(u, p, cone, angle):
     
     u = np.array([u['x'],u['y']])
     point = np.array([p['x'],p['y']])
 
-    angleA = math.radians(cone * 90)
-    angleB = math.radians((cone + 1) * 90)
+    angleA = math.radians(cone * angle)
+    angleB = math.radians((cone + 1) * angle)
     vecA = np.array([math.cos(angleA), math.sin(angleA)])
     vecB = np.array([math.cos(angleB), math.sin(angleB)])
     
@@ -44,9 +44,9 @@ def inCone(u, p, cone):
 
 
 def getEdge(fro, to, edges):
-    print(len(edges))
+    
     for edge in edges:
-        print(edge)
+        
         if edge['from'] == fro and edge['to'] == to:
             return edge
 
@@ -56,7 +56,7 @@ def getNeighbours(edges, u):
     return [edge['to'] for edge in edges if edge['from'] == u]
     
 
-def Clean(u, t, N, d):
+def Clean(u, t, N, d, angle):
     
 
     # Need to project the point onto the diagonal. If the point has a greater y than the projection then we know its cone 2 (0,1,2,3)
@@ -64,7 +64,7 @@ def Clean(u, t, N, d):
     cone = chooseCone(u, t, d)
 
     for neighbor in N:
-        if not inCone(u, neighbor, cone): 
+        if not inCone(u, neighbor, cone, angle): 
             continue
         
         project = projection(t, neighbor, d)
@@ -74,43 +74,79 @@ def Clean(u, t, N, d):
             return False
 
 
-def Greedy(u,t,N):
+def Greedy(u,t,N, angle):
     # First find the cone of u that contains t
     cone = None
     for i in range(4):
-        if inCone(u, t, i):
+        if inCone(u, t, i, angle):
             cone = i 
             break
     
     #Next find the node that is in the same cone as t
     node = None
     for i in range(len(N)):
-        if inCone(u, N[i], cone):
+        if inCone(u, N[i], cone, angle):
             return N[i]
 
     return None 
 
 
-def Sweep(u, t, N, d):
+def Sweep(u, t, N, d, angle):
     # Choose the cone in the direction of the diagonal
     cone = chooseCone(u, t, d)
     
     for i in range(len(N)):
-        if inCone(u, N[i], cone):
+        if inCone(u, N[i], cone, angle):
             return N[i]
         
 
     return None
 
-def NextStep(u, t, N, d):
+def buildHTML(G, edgedist, eudist, pathlength):
+    return f"""
+        Edge Length:                {edgedist}
+        Path Length:                {pathlength}
+        Routing Ratio:              {(pathlength)/eudist}
+        Euclidean distance (p->q):  {eudist}
+        """
+
+
+def buildPath(G, path, eudist, pathlength, positions):
+    for i in path:
+        
+        edgedist = getEudist(i[0], i[1], positions)
+        html = buildHTML(G, edgedist, eudist, pathlength)
+        edge = getEdge(i[0], i[1], G.edges)
+        
+        G.edges.remove(edge)
+        G.add_edge(i[0], i[1], color="#FF0000" if len(i) < 3 or i[2] == 'Sweep' else '#0000FF' , title=html, width=40)
+
+def NextStep(u, t, N, d, angle):
     
-    if Clean(u, t, N,d):
-        return (Greedy(u, t, N), 'Greedy')
+    if Clean(u, t, N,d, angle):
+        return (Greedy(u, t, N, angle), 'Greedy')
 
     else:
-        return (Sweep(u, t, N, d), 'Sweep')
+        return (Sweep(u, t, N, d, angle), 'Sweep')
+
+
+def getEudist(origin, destination, positions=[]):
+    if type(origin) is int:
+        originx, originy = positions[origin-1]
+    else:
+        originx = origin['x']
+        originy = origin['y']
+
+    if type(destination) is int:
+        destinationx, destinationy = positions[destination-1]
+    else:
+        destinationx = destination['x']
+        destinationy = destination['y']
+    
+    return math.sqrt(((destinationx-originx) **2)+((destinationy-originy) **2))
 
 def routeTheta4(G, origin, destination, positions):
+    angle=90
     d1 = np.array([1,-1])
     normdiag1 = d1 / np.linalg.norm(d1)
     d2 = np.array([-1,1])
@@ -132,46 +168,99 @@ def routeTheta4(G, origin, destination, positions):
             d = normdiag1
         else:
             d = normdiag2
-        u = NextStep(u, t, N, d)
-        print(u)
+        u = NextStep(u, t, N, d, angle)
+        # print(u)
         path.append((last['id'],u[0]['id'],u[1]))
         pathnodes.append(u[0]['id'])
-        pathlength += getEudist(last, u[0]['id'], positions)
+        pathlength += getEudist(last['id'], u[0]['id'], positions)
+        print(pathlength)
         u = u[0]
         
-    for i in path:
-        print(i)
-        edgedist = getEudist(i[0], i[1], positions)
-        html = f"""
-        Edge Length:                {edgedist}
-        Path Length:                {pathlength/1000}
-        Routing Ratio:              {(pathlength/1000)/eudist}
-        Euclidean distance (p->q):  {eudist}
-        """
-        edge = getEdge(i[0], i[1], G.edges)
-        print(edge)
-        G.edges.remove(edge)
-        G.add_edge(i[0], i[1], color="#FF0000" if i[2] == 'Sweep' else '#0000FF' , title=html, width=40)
+    buildPath(G, path, eudist, pathlength, positions)
 
     return pathlength
         
 
-def getEudist(origin, destination, positions):
-    if type(origin) is int:
-        originx, originy = positions[origin-1]
-    else:
-        originx = origin['x']
-        originy = origin['y']
-
-    if type(destination) is int:
-        destinationx, destinationy = positions[destination-1]
-    else:
-        destinationx = destination['x']
-        destinationy = destination['y']
-    
-    return math.sqrt(((destinationx-originx) **2)+((destinationy-originy) **2))
 
     
+def case1(N, u , cone, angle):
+    for i in range(len(N)):
+        if inCone(u, N[i], cone, angle):
+            return N[i]
+
+    return None
+
+def case2(N, t, cone, angle):
+    for i in range(len(N)):
+        if inCone(t, N[i], cone, angle):
+            return N[i]
+
+    return None
+    
+
+def caseC():
+    print("case C")
+
+def caseD():
+    print("case D")
+
+def routeHalfTheta6(G, origin, destination, positions):
+    angle = 60
+    eudist = getEudist(origin, destination, positions)
+    pathlength = 0
+    u = G.get_node(origin)
+    t = G.get_node(destination)
+    last = None
+    path = []
+    pathnodes = []
+    pathnodes.append(u)
+
+    while not u is t:
+        
+        found = False
+        Nu = [G.get_node(node) for node in getNeighbours(G.edges, u['id'])]
+        Nt = [G.get_node(node) for node in getNeighbours(G.edges, t['id'])]
+
+        # The case of destination being in a positive cone of u
+        for i in [0,2,4]:
+            if inCone(u, t, i, angle):
+                
+                last = u
+                cone = i
+                u = case1(Nu, u, cone, angle)
+                
+                path.append((last['id'], u['id']))
+                pathlength += getEudist(last, u) / 100
+                print(pathlength)
+
+                found = True
+                break
+        if found: continue 
+
+        for i in [0,2,4]:
+            if inCone(t,u,i, angle):
+                last = t
+                cone = i
+                t = case2(Nt, t, cone, angle)
+                path.append((last['id'], t['id']))
+                pathlength += getEudist(last, t) / 100
+                print(pathlength)
+                found = True 
+                break 
+        if found: continue
+
+        # The case of the destination being in a negative cone of u but zones 1 and 2 are both empty
+    
+    buildPath(G, path, eudist, pathlength, positions)
+
+
+
+
+
+
+        
+
+
 
 def build_path(G, origin, destination, selection, positions, cones):
     
@@ -187,6 +276,10 @@ def build_path(G, origin, destination, selection, positions, cones):
         G.show("Route.html", notebook=False)
     elif selection == "Theta" and cones == 4:
         vals = routeTheta4(G, origin, destination, positions)
+        G.show("Route.html", notebook=False)
+    elif selection.lower().startswith("half"):
+        
+        routeHalfTheta6(G, origin, destination, positions)
         G.show("Route.html", notebook=False)
         
         
