@@ -5,6 +5,26 @@ import math
 import random
 
 
+def even(n):
+    return n % 2 == 0
+
+def height(u, t, positions):
+    if type(u) == int:
+        ux,uy = positions[u-1]
+    else:
+        ux = u['x']
+        uy = u['y']
+    
+    if type(t) == int:
+        tx,ty = positions[t-1]
+    else:
+        tx = t['x']
+        ty = t['y']
+
+    return abs(ux-tx) + abs(uy - ty)
+
+    
+
 def chooseCone(u, t, d):
     point = projection(t, u, d)
     u = np.array([u['x'],u['y']])
@@ -198,11 +218,6 @@ def case2(N, t, cone, angle):
     return None
     
 
-def caseC():
-    print("case C")
-
-def caseD():
-    print("case D")
 
 def routeHalfTheta6(G, origin, destination, positions):
     angle = 60
@@ -253,11 +268,86 @@ def routeHalfTheta6(G, origin, destination, positions):
     
     buildPath(G, path, eudist, pathlength, positions)
 
+def chooseDiagonal(u, t, positions, angle):
+    #Cone 0
+    dpp = np.array([1,1])
+    normdpp = dpp / np.linalg.norm(dpp)
+    # Cone 1
+    dpn = np.array([-1,-1])
+    normdpn = dpn / np.linalg.norm(dpn)
+    # Cone 2
+    dnp = np.array([-1,1])
+    normdnp = dnp / np.linalg.norm(dnp)
+    # Cone 3
+    dnn = np.array([1,-1])
+    normdnn = dnn / np.linalg.norm(dnn)
+
+    diagonals = [dpp, dnp, dpn,dnn]
+    for cone in range(4):
+        if inCone(t['id'] if type(t) == int else t, u['id'] if type(u) == int else u, cone, angle):
+            return diagonals[cone]
+    
+    return None
+
+def chooseYaoCone(p, t, d):
+    for i in range(4):
+        if inCone(t, p, i, 90):
+            cone = i
+            break
+
+    if even(cone):
+        return 1 if projection(t, p, d)[1] > p['y'] else 3
+    else:
+        return 0 if projection(t, p, d)[1] > p['y'] else 2
+
+# def yaoClean(p, t, N, d, cone):
+#     for node in N:
+#         if inCone(p, node, cone, 90):
+#             return (cone in [0,1] and projection(t, node, d)[1] < node['y']) or (cone in [2,3] and projection(t, node, d)[1] > node['y'])
+
+# def YaoSweep(p, N, d, angle, cone):
+    
+
+def CheckSweep(p, t, N, d, angle):
+    
+    cone = chooseYaoCone(p, t, d)
+    for i in range(len(N)):
+        if inCone(p, N[i], cone, angle):
+            return N[i]
+        
+
+    return None
 
 
 
+def GreedySweep(G, p, t, d, positions, angle):
+    N = [G.get_node(node) for node in getNeighbours(G.edges, p if type(p) == int else p['id'])]
+    q = Greedy(p, t, N, angle)
+    r = CheckSweep(p, t, N, d, angle)
 
+    if r is None or getEudist(p, r, positions) > height(p, t, positions):
+        return q
+    else:
+        return r
 
+def routeYao(G, s, t, positions):
+    eudist = getEudist(s, t, positions)
+    angle = 360/4
+    u = G.get_node(s)
+    t = G.get_node(t)
+    last = None
+    path = []
+    pathlength = 0
+    
+    while not u is t:
+        d = chooseDiagonal(u, t, positions, angle)
+        last = u
+        u = GreedySweep(G, u, t, d, positions, angle)
+        path.append((last['id'], u['id']))
+        pathlength += getEudist(last, u)
+        print(u)
+    
+    buildPath(G, path, eudist, pathlength, positions)
         
 
 
@@ -280,6 +370,9 @@ def build_path(G, origin, destination, selection, positions, cones):
     elif selection.lower().startswith("half"):
         
         routeHalfTheta6(G, origin, destination, positions)
+        G.show("Route.html", notebook=False)
+    elif selection.lower().startswith("yao") and cones == 4:
+        routeYao(G, origin, destination, positions)
         G.show("Route.html", notebook=False)
         
         
