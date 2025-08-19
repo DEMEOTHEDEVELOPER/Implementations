@@ -8,20 +8,19 @@ import random
 def even(n):
     return n % 2 == 0
 
-def height(u, t, positions):
+def height(u, t, d ,positions):
     if type(u) == int:
         ux,uy = positions[u-1]
+        
     else:
         ux = u['x']
         uy = u['y']
     
-    if type(t) == int:
-        tx,ty = positions[t-1]
-    else:
-        tx = t['x']
-        ty = t['y']
+    proj = projection(t, u, d)
+    projx = proj[0]
+    projy = proj[1]
 
-    return abs(ux-tx) + abs(uy - ty)
+    return abs(ux-projx) + abs(uy - projy)
 
     
 
@@ -289,16 +288,16 @@ def chooseDiagonal(u, t, positions, angle):
     
     return None
 
-def chooseYaoCone(p, t, d):
-    for i in range(4):
-        if inCone(t, p, i, 90):
-            cone = i
-            break
+# def chooseYaoCone(p, t, d):
+#     for i in range(4):
+#         if inCone(t, p, i, 90):
+#             cone = i
+#             break
 
-    if even(cone):
-        return 1 if projection(t, p, d)[1] > p['y'] else 3
-    else:
-        return 0 if projection(t, p, d)[1] > p['y'] else 2
+#     if even(cone):
+#         return 1 if projection(t, p, d)[1] > p['y'] else 3
+#     else:
+#         return 0 if projection(t, p, d)[1] > p['y'] else 2
 
 # def yaoClean(p, t, N, d, cone):
 #     for node in N:
@@ -319,13 +318,37 @@ def CheckSweep(p, t, N, d, angle):
     return None
 
 
+def YaoSweep(p, t, N, d, angle):
+    
+
+    # figure out which cone faces the diagonal
+    # if point is in an even cone of t, the diagonal will be in an odd cone of p
+    # otherwise it will be in an even cone of p
+
+    for i in range(4):
+        if inCone(t, p, i, angle):
+            cone = i
+            break
+        
+    if even(cone):
+        dcone = 0 if projection(t, p, d)[0] < p['x'] else 2
+    else:
+        dcone = 1 if projection(t, p, d)[0] > p['x'] else 3
+    
+    # Return the neighbour in that cone
+    for node in N:
+        if inCone(p, node, dcone, angle):
+            return node 
+
+    return None
+
 
 def GreedySweep(G, p, t, d, positions, angle):
     N = [G.get_node(node) for node in getNeighbours(G.edges, p if type(p) == int else p['id'])]
     q = Greedy(p, t, N, angle)
-    r = CheckSweep(p, t, N, d, angle)
+    r = YaoSweep(p, t, N, d, angle)
 
-    if r is None or getEudist(p, r, positions) > height(p, t, positions):
+    if r is None or getEudist(p, r, positions) > height(p, t, d, positions):
         return q
     else:
         return r
@@ -338,7 +361,8 @@ def routeYao(G, s, t, positions):
     last = None
     path = []
     pathlength = 0
-    
+    nodes = []
+
     while not u is t:
         d = chooseDiagonal(u, t, positions, angle)
         last = u
@@ -346,8 +370,13 @@ def routeYao(G, s, t, positions):
         path.append((last['id'], u['id']))
         pathlength += getEudist(last, u)
         print(u)
+        if not u in nodes:
+            nodes.append(u)
+        else:
+            nodes.append(u)
+            break
     
-    buildPath(G, path, eudist, pathlength, positions)
+    buildPath(G, path, eudist, pathlength/100, positions)
         
 
 
