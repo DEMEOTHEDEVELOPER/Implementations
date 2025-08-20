@@ -288,35 +288,6 @@ def chooseDiagonal(u, t, positions, angle):
     
     return None
 
-# def chooseYaoCone(p, t, d):
-#     for i in range(4):
-#         if inCone(t, p, i, 90):
-#             cone = i
-#             break
-
-#     if even(cone):
-#         return 1 if projection(t, p, d)[1] > p['y'] else 3
-#     else:
-#         return 0 if projection(t, p, d)[1] > p['y'] else 2
-
-# def yaoClean(p, t, N, d, cone):
-#     for node in N:
-#         if inCone(p, node, cone, 90):
-#             return (cone in [0,1] and projection(t, node, d)[1] < node['y']) or (cone in [2,3] and projection(t, node, d)[1] > node['y'])
-
-# def YaoSweep(p, N, d, angle, cone):
-    
-
-def CheckSweep(p, t, N, d, angle):
-    
-    cone = chooseYaoCone(p, t, d)
-    for i in range(len(N)):
-        if inCone(p, N[i], cone, angle):
-            return N[i]
-        
-
-    return None
-
 
 def YaoSweep(p, t, N, d, angle):
     
